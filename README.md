@@ -1,4 +1,4 @@
-PiLab Studio v5.5 — Resizable Python Editor
+PiLab Studio v5.5 — Resizable Python Editor (Disclaimer, made by AI)
 =========================================
 
 WHAT'S NEW
