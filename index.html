@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>PiLab Studio v5.5 — Resizable Python Editor</title>
+<title>PiLab Studio v6 — Raspberry Pi OS Lab</title>
 <style>
 /* BASICS */
 
@@ -531,12 +531,17 @@ body.pilab-resizing-height,body.pilab-resizing-height *{cursor:row-resize!import
  .right .editor-tools small{display:none}
 }
 
+#shellPage[hidden],#shNano[hidden],#shForm[hidden]{display:none!important}
+#shellPage{height:calc(100dvh - 70px);display:flex;flex-direction:column;min-height:0;background:#0b1420;padding:16px;gap:12px;box-sizing:border-box;overflow:auto}
+.sh-head,.sh-hosts,.sh-terminal-bar,.sh-bottom,.sh-nano-actions,.sh-nano-title{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}.sh-head h2{font-size:21px;margin:3px 0}.sh-head p,.sh-guide p{color:var(--muted);font-size:12px;line-height:1.5;margin:6px 0}.sh-kicker{font-size:10px;letter-spacing:1.6px;color:var(--accent);font-weight:800}.sh-actions{display:flex;gap:6px;flex-wrap:wrap}.sh-hosts{justify-content:flex-start}.sh-hosts button.active,.topactions button.active{border-color:var(--accent);color:var(--accent)}#shHostInfo{font-size:12px;color:var(--muted)}.sh-main{display:grid;grid-template-columns:250px minmax(0,1fr);flex:1;min-height:350px;gap:12px}.sh-guide{overflow:auto;border:1px solid var(--line);border-radius:12px;background:#111e2c;padding:14px}.sh-guide h3{font-size:14px;margin:0 0 8px}.sh-guide h4{font-size:12px;margin:16px 0 6px;color:#dbe8f8}.sh-guide .btn{white-space:normal}.sh-command,.sh-file{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid #233649;background:transparent;color:#b8d7ee;padding:7px 2px;font:11px monospace;overflow-wrap:anywhere;cursor:pointer}.sh-command:hover,.sh-file:hover,.sh-file.active{color:#8ff0c4;background:#20374a}.sh-terminal{position:relative;display:flex;flex-direction:column;min-width:0;min-height:350px;background:#090e14;border:1px solid #2c4156;border-radius:12px;overflow:hidden;--sh-font:14px}.sh-terminal-bar,.sh-bottom{padding:10px 12px;background:#162332;font-size:11px;color:#b3c3d6}.sh-terminal-bar span:first-child{color:#9be7bd}#shScroll{flex:1;overflow:auto;padding:15px;font:var(--sh-font)/1.55 Consolas,'Liberation Mono',monospace;color:#dce6ed;min-height:180px;white-space:pre-wrap;overflow-wrap:anywhere}#shOutput>div{white-space:pre-wrap}.sh-out-command{color:#91e5b4}.sh-out-error{color:#ff9d9d}.sh-out-note{color:#92a9c1}#shForm{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap}#shPrompt{color:#96e6b1;white-space:pre-wrap}#shInput{flex:1;min-width:90px;background:transparent;border:0;color:#eef7fa;font:inherit;outline:none;padding:2px}#shInput:focus-visible{outline:0}#shForm button{padding:3px 7px}#shNano{position:absolute;inset:36px 0 44px;background:#0b1017;display:flex;flex-direction:column;z-index:4}.sh-nano-title,.sh-nano-actions{background:#d3e0eb;color:#102236;padding:8px 12px;font:12px monospace}#shNanoText{flex:1;min-height:0;resize:none;background:#0b1017;color:#f2f3f4;font:var(--sh-font)/1.5 monospace;border:0;padding:12px;tab-size:4;outline:none}#shNanoStatus{font:12px monospace}.shell-active:not(.shell-split)>.workspace{display:none!important}.shell-active.shell-split #shellPage{width:56%}.shell-active.shell-split>.workspace{position:fixed;top:70px;right:0;width:44%;height:calc(100dvh - 70px);display:grid!important;grid-template-columns:minmax(0,1fr)!important;overflow:hidden}.shell-active.shell-split>.workspace>.side,.shell-active.shell-split>.workspace>.right{display:none!important}.shell-active.shell-split>.workspace>.center{min-height:0}.shell-active.shell-split .sh-main{grid-template-columns:minmax(0,1fr)}.shell-active.shell-split .sh-guide{display:none}.shell-active.shell-split .centerbar{flex-wrap:wrap}.shell-active .topactions #runBtn{display:none}.shell-active .topactions #saveBtn,.shell-active .topactions #openBtn{display:none}
+@media(max-width:930px){#shellPage{height:auto;min-height:calc(100dvh - 100px)}.sh-main{grid-template-columns:1fr}.sh-guide{max-height:230px}.sh-terminal{min-height:500px}.shell-active.shell-split #shellPage{width:100%}.shell-active.shell-split>.workspace{position:relative;top:auto;width:100%;height:650px}.shell-active.shell-split .sh-guide{display:block}}
+
 </style>
 </head>
 <body>
 <header class="topbar">
   <div class="brand"><div class="brand-icon">π</div><div><h1>PiLab <span style="color:var(--accent)">Studio</span></h1><p>Raspberry Pi 4 GPIO circuit & Python simulator</p></div></div>
-  <div class="topactions">
+  <div class="topactions"><button class="btn active" id="circuitTab">Circuit &amp; Python</button><button class="btn" id="shellTab">Pi OS Terminal</button>
     <span class="status-pill"><i id="statusDot" class="status-dot"></i><span id="runtimeStatus">Python not loaded</span></span>
     <button class="btn" id="saveBtn" title="Download circuit and code as a project file">↓ Save</button>
     <button class="btn" id="openBtn" title="Open a saved project">↑ Open</button>
@@ -545,6 +550,13 @@ body.pilab-resizing-height,body.pilab-resizing-height *{cursor:row-resize!import
     <button class="btn danger" id="stopBtn" disabled>■ Stop</button>
   </div>
 </header>
+<section id="shellPage" hidden aria-label="Virtual Raspberry Pi terminal">
+ <div class="sh-head"><div><span class="sh-kicker">PI LAB / ENVIRONMENT</span><h2>Raspberry Pi OS terminal</h2><p>Simulated Linux shell · shared GPIO circuit · local browser files</p></div><div class="sh-actions"><button class="btn tiny" id="shSplit" aria-pressed="false">Show circuit</button><button class="btn tiny" id="shSmaller">A−</button><button class="btn tiny" id="shLarger">A+</button><button class="btn tiny" id="shReset">Reset environment</button></div></div>
+ <div class="sh-hosts"><button class="btn" id="shLaptop">Ubuntu laptop</button><button class="btn" id="shPi">Raspberry Pi 4</button><span id="shHostInfo"></span></div>
+ <div class="sh-main"><aside class="sh-guide"><h3>Lab 5 practice</h3><p>Start on Ubuntu, or open the Pi terminal directly. The virtual IP is 192.168.1.10; the practice password is raspberry.</p><button class="btn" id="shLabCircuit">Load GPIO17 LED circuit</button><p>GPIO17 → 330 Ω → LED → GND. This replaces the current circuit.</p><h4>Command reference</h4><div id="shCommands"></div><h4>Keyboard</h4><p>↑ / ↓ history · Tab completion · Ctrl+C interrupt · Ctrl+L clear · nano: Ctrl+O save, Ctrl+X exit.</p><h4>Environment files</h4><div id="shFiles"></div><button class="btn tiny" id="shImport">Import file</button><input type="file" id="shUpload" hidden><button class="btn tiny" id="shExport">Download selected file</button><p>Files persist in this browser. Shell, SSH, SCP and package installation are simulated, not real OS/network operations.</p></aside>
+ <div class="sh-terminal"><div class="sh-terminal-bar"><span>● &nbsp;<span id="shTitle">pi@raspberrypi</span></span><span id="shStatus">Shell ready</span></div><div id="shScroll" role="log" aria-label="Linux terminal output"><div id="shOutput"></div><form id="shForm" autocomplete="off"><label id="shPrompt" for="shInput"></label><input id="shInput" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Linux terminal command"><button type="submit" class="btn tiny">Enter</button></form></div><div id="shNano" hidden><div class="sh-nano-title"><strong>GNU nano (simulation)</strong><span id="shNanoName"></span></div><textarea id="shNanoText" spellcheck="false" aria-label="Nano file contents"></textarea><div class="sh-nano-actions"><button class="btn" id="shNanoSave">^O Write Out</button><button class="btn" id="shNanoExit">^X Exit</button><span id="shNanoStatus"></span></div></div><div class="sh-bottom"><button class="btn danger tiny" id="shInterrupt">Ctrl+C Interrupt</button><button class="btn tiny" id="shClear">Clear</button><button class="btn tiny" id="shOpenEditor">Open selected .py in code editor</button><button class="btn tiny" id="shSaveEditor">Save code editor to file</button></div></div></div>
+</section>
+
 <div class="workspace">
 <aside class="side">
   <div class="section-title">Add components</div>
@@ -11871,6 +11883,7 @@ function renderInspector(){const root=$('#inspectorPane');if(state.selectedWire)
 function renderAll(){renderParts();renderInspector();drawWires();updateDeleteUI();commit()}
 function switchTab(t){state.tab=t;for(const k of ['console','inspector','diagnostic']){$('#'+k+'Tab').classList.toggle('active',t===k);$('#'+k+'Pane').classList.toggle('hidden',t!==k)}}
 function log(str,kind='normal'){
+ window.piLabShell?.onLog(str,kind);
  const pane=$('#consolePane'),out=$('#consoleOutput');
  const line=document.createElement('div');line.className='log '+kind;line.textContent=String(str);
  out.append(line);
@@ -11884,11 +11897,13 @@ function renderTerminalInput(){
  const request=state.inputQueue[0]||null;
  const row=$('#terminalInputForm'),label=$('#terminalInputPrompt'),field=$('#terminalInput');
  row.classList.toggle('hidden',!request);
+ window.piLabShell?.refresh();
+ if(window.piLabShell?.isJob()&&window.piLabShell.visible())return;
  if(request){label.textContent=request.prompt||'›';field.value='';switchTab('console');
   requestAnimationFrame(()=>{if(state.inputQueue[0]===request){$('#consolePane').scrollTop=$('#consolePane').scrollHeight;field.focus()}});
  }
 }
-function clearPendingTerminalInputs(){state.inputQueue=[];$('#terminalInputForm').classList.add('hidden');$('#terminalInput').value='';}
+function clearPendingTerminalInputs(){state.inputQueue=[];window.piLabShell?.refresh();$('#terminalInputForm').classList.add('hidden');$('#terminalInput').value='';}
 function submitTerminalInput(){
  const request=state.inputQueue.shift();
  if(!request||!state.running||!state.worker){clearPendingTerminalInputs();return}
@@ -11919,7 +11934,7 @@ function killRun(){
  resetOutputs();
  $('#runBtn').disabled=true;$('#stopBtn').disabled=true;
  $('#codeState').textContent='Program stopped · GPIO outputs reset';
- if(wasRunning)log('■ Program stopped immediately. All GPIO outputs reset.','note');
+ if(wasRunning)log('■ Program stopped immediately. All GPIO outputs reset.','note');window.piLabShell?.finish();
  if(old){makeWorker();setRuntimeStatus('Stopped · preparing Python','');}
  else setRuntimeStatus('Python not loaded','');
 }
@@ -11928,30 +11943,30 @@ function scheduleSave(){clearTimeout(scheduleSave.timer);scheduleSave.timer=setT
 function serialize(){return {format:'PiLabStudio',version:1,parts:state.parts.map(p=>p.type==='button'?{...p,pressed:false}:p),wires:state.wires,code:getCode(),example:state.example,nextId:state.nextId}}
 function loadProject(data){if(!data||data.format!=='PiLabStudio'||!Array.isArray(data.parts)||!Array.isArray(data.wires))throw Error('Not a PiLab Studio project file');killRun();state.parts=data.parts.filter(p=>TYPES[p.type]&&typeof p.id==='string'&&Number.isFinite(p.x)&&Number.isFinite(p.y)).slice(0,70).map(p=>({...structuredClone(DEFAULTS[p.type]),...p,x:Math.max(0,Math.min(1500,p.x)),y:Math.max(0,Math.min(1400,p.y)),...(p.type==='led'?{color:normalizeLedColor(p.color)}:p.type==='button'?{pressed:false}:{})}));state.wires=data.wires.filter(w=>typeof w.a==='string'&&typeof w.b==='string'&&w.a.length<120&&w.b.length<120).slice(0,250);state.nextId=Math.max(1,Number(data.nextId)||1,...state.parts.map(p=>(parseInt(p.id.replace(/\D/g,''),10)||0)+1));state.example=SAMPLES[data.example]?data.example:'button';$('#sampleSelect').value=state.example;setCode(String(data.code||'').slice(0,120000));state.selectedPart=null;state.selectedWire=null;state.pending=null;state.gpio={};state.configs={};state.pwm={};state.servo={};renderAll()}
 function downloadProject(){const blob=new Blob([JSON.stringify(serialize(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='PiLab_Project.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);log('Project saved to PiLab_Project.json','good')}
-function handleWorker(m){if(m.type==='syntax'){receiveCodeCheck(m);return}
+function handleWorker(m){if(m.type==='shellFiles'){window.piLabShell?.syncFiles(m);return}if(m.type==='syntax'){receiveCodeCheck(m);return}
  if(m.type==='inputRequest'){
   if(!state.running||!Number.isSafeInteger(m.id))return;
   state.inputQueue.push({id:m.id,prompt:String(m.prompt??'')});
   if(state.inputQueue.length===1)renderTerminalInput();
   return;
  }
-if(m.type==='ready'){state.pyReady=true;setRuntimeStatus('Python ready','ready');$('#runBtn').disabled=false;$('#codeState').textContent='Python 3 ready · RPi.GPIO & gpiozero';log('Python runtime ready. Press ▶ Run Python.','good');syncInputs();syncSensors();scheduleCodeCheck();return}
+if(m.type==='ready'){state.pyReady=true;setRuntimeStatus('Python ready','ready');$('#runBtn').disabled=false;$('#codeState').textContent='Python 3 ready · RPi.GPIO & gpiozero';log('Python runtime ready. Press ▶ Run Python.','good');syncInputs();syncSensors();scheduleCodeCheck();window.piLabShell?.refresh();return}
  if(m.type==='loading'){setRuntimeStatus('Python loading · program stopped');log('Loading Python interpreter (requires an internet connection)…','note');return}
- if(m.type==='loadError'){state.pyReady=false;setRuntimeStatus('Python load failed','error');log('Python interpreter failed to load: '+m.message,'err');log('Check your internet connection, then reload this HTML file.','warn');return}
+ if(m.type==='loadError'){state.pyReady=false;setRuntimeStatus('Python load failed','error');log('Python interpreter failed to load: '+m.message,'err');log('Check your internet connection, then reload this HTML file.','warn');window.piLabShell?.refresh();return}
  if(m.type==='callback'){state.callbackCount=(state.callbackCount||0)+m.handlers;const badge=$('#callbackCount');if(badge){badge.textContent='⚡ '+state.callbackCount+' callbacks';badge.classList.add('recent');clearTimeout(badge._flash);badge._flash=setTimeout(()=>badge.classList.remove('recent'),500)}log('⚡ GPIO'+m.pin+' '+m.edge+' · '+m.handlers+' callback'+(m.handlers===1?'':'s')+' executed','good');return}
  if(m.type==='stdout'){if(m.message.trim())log(m.message,'normal');return}
  if(m.type==='stderr'){if(m.message.trim())log(m.message,'err');return}
  if(m.type==='started'){state.running=true;setRuntimeStatus('Program running','running');$('#codeState').textContent='main.py · running snapshot (edits require Run again)';$('#runBtn').disabled=true;$('#stopBtn').disabled=false;log('▶ Python program started','good');return}
- if(m.type==='finished'){clearPendingTerminalInputs();state.running=false;resetOutputs();syncInputs();$('#runBtn').disabled=!state.pyReady;$('#stopBtn').disabled=true;setRuntimeStatus(state.pyReady?'Python ready':'Loading Python…',state.pyReady?'ready':'');$('#codeState').textContent='Python 3 ready · outputs reset';log('■ '+(m.stopped?'Program stopped':'Program finished')+' · GPIO outputs reset',m.stopped?'note':'good');scheduleCodeCheck();return}
+ if(m.type==='finished'){clearPendingTerminalInputs();state.running=false;resetOutputs();syncInputs();$('#runBtn').disabled=!state.pyReady;$('#stopBtn').disabled=true;setRuntimeStatus(state.pyReady?'Python ready':'Loading Python…',state.pyReady?'ready':'');$('#codeState').textContent='Python 3 ready · outputs reset';log('■ '+(m.stopped?'Program stopped':'Program finished')+' · GPIO outputs reset',m.stopped?'note':'good');scheduleCodeCheck();window.piLabShell?.finish();return}
  if(m.type==='gpioSetup'){state.configs[m.pin]={dir:m.dir,pull:m.pull};if(m.initial!==null&&m.initial!==undefined)state.gpio[m.pin]=Number(m.initial);commit();return}
  if(m.type==='gpio'){state.gpio[m.pin]=Number(m.value);syncInputs();return}
  if(m.type==='pwm'){state.pwm[m.pin]={duty:m.duty,freq:m.freq};state.gpio[m.pin]=m.duty>0?1:0;if(m.freq>=40&&m.freq<=60){const pulse=(m.duty/100)*(1000/m.freq);state.servo[m.pin]=Math.min(180,Math.max(0,(pulse-1)*180))}updatePartVisuals();syncInputs();return}
  if(m.type==='servo'){state.servo[m.pin]=Number(m.angle);updatePartVisuals();return}
  if(m.type==='lcd'){const part=state.parts.find(p=>p.name===m.name&&p.type==='lcd');if(part){part.text=String(m.text).slice(0,32);updatePartVisuals();scheduleSave()}else log('LCD not found: '+m.name,'warn');return}
  if(m.type==='cleanup'){const pins=m.pin===null?Object.keys(state.configs):[String(m.pin)];for(const pin of pins){state.gpio[pin]=0;delete state.configs[pin];delete state.pwm[pin]}commit();return}
- if(m.type==='error'){log(m.message,'err');showRuntimeCodeError(m.message);return}}
-function makeWorker(){clearPendingTerminalInputs();const existing=state.worker;if(existing)existing.terminate();state.pyReady=false;state.running=false;setRuntimeStatus('Loading Python…');$('#runBtn').disabled=true;$('#stopBtn').disabled=true;const workerSource=document.querySelector('#workerSource').textContent;const blobURL=URL.createObjectURL(new Blob([workerSource],{type:'text/javascript'}));const w=new Worker(blobURL);setTimeout(()=>URL.revokeObjectURL(blobURL),2000);state.worker=w;const generation=++state.workerVersion;w.onmessage=e=>{if(state.worker!==w||state.workerVersion!==generation)return;handleWorker(e.data)};w.onerror=e=>{if(state.worker!==w||state.workerVersion!==generation)return;log('Web Worker error: '+(e.message||'unknown error'),'err');setRuntimeStatus('Worker error','error');state.pyReady=false;state.running=false;resetOutputs();$('#runBtn').disabled=true;$('#stopBtn').disabled=true};w.postMessage({type:'init'});return w}
-function runProgram(){clearPendingTerminalInputs();state.callbackCount=0;if($('#callbackCount'))$('#callbackCount').textContent='⚡ 0 callbacks';if(!state.pyReady||state.running||!state.worker)return;clearConsole();switchTab('console');resetOutputs();state.running=true;setRuntimeStatus('Starting program…','running');$('#runBtn').disabled=true;$('#stopBtn').disabled=false;$('#codeState').textContent='Starting Python…';state.lastRunSource=getCode();state.worker.postMessage({type:'run',code:state.lastRunSource});scheduleSave()}
+ if(m.type==='error'){log(m.message,'err');if(!window.piLabShell?.isJob())showRuntimeCodeError(m.message);return}}
+function makeWorker(){clearPendingTerminalInputs();const existing=state.worker;if(existing)existing.terminate();state.pyReady=false;state.running=false;setRuntimeStatus('Loading Python…');$('#runBtn').disabled=true;$('#stopBtn').disabled=true;const workerSource=document.querySelector('#workerSource').textContent;const blobURL=URL.createObjectURL(new Blob([workerSource],{type:'text/javascript'}));const w=new Worker(blobURL);setTimeout(()=>URL.revokeObjectURL(blobURL),2000);state.worker=w;const generation=++state.workerVersion;w.onmessage=e=>{if(state.worker!==w||state.workerVersion!==generation)return;handleWorker(e.data)};w.onerror=e=>{if(state.worker!==w||state.workerVersion!==generation)return;log('Web Worker error: '+(e.message||'unknown error'),'err');setRuntimeStatus('Worker error','error');state.pyReady=false;state.running=false;resetOutputs();$('#runBtn').disabled=true;$('#stopBtn').disabled=true;window.piLabShell?.finish();window.piLabShell?.refresh()};w.postMessage({type:'init'});return w}
+function runProgram(source,options=null){if(!state.pyReady||state.running||!state.worker)return;clearPendingTerminalInputs();state.callbackCount=0;if($('#callbackCount'))$('#callbackCount').textContent='⚡ 0 callbacks';if(!state.pyReady||state.running||!state.worker)return;clearConsole();switchTab('console');resetOutputs();state.running=true;setRuntimeStatus('Starting program…','running');$('#runBtn').disabled=true;$('#stopBtn').disabled=false;$('#codeState').textContent='Starting Python…';state.lastRunSource=typeof source==='string'?source:getCode();state.worker.postMessage({type:'run',code:state.lastRunSource,options});scheduleSave()}
 // Workspace navigation: wheel scroll, Shift+wheel horizontal scroll,
 // middle-button drag, Space+drag, or the optional left-button Pan tool.
 const circuitViewport=$('#viewport');
@@ -12003,7 +12018,7 @@ $('#partsLayer').addEventListener('click',e=>{const remove=e.target.closest('[da
 let moving=null;$('#partsLayer').addEventListener('pointerdown',e=>{if(e.button!==0||panMode||spacePan||panDrag||e.target.closest('[data-delete-id]'))return;const h=e.target.closest('.part-heading');if(!h)return;const el=h.closest('.part'),p=state.parts.find(x=>x.id===el.dataset.id);if(!p)return;moving={id:p.id,x:p.x,y:p.y,pageX:e.clientX,pageY:e.clientY,el};h.setPointerCapture?.(e.pointerId);e.preventDefault();selectPart(p.id,false)});
 document.addEventListener('pointermove',e=>{if(panDrag)return;if(moving){const p=state.parts.find(x=>x.id===moving.id);if(!p)return;p.x=Math.max(5,Math.min(920,moving.x+e.clientX-moving.pageX));p.y=Math.max(5,Math.min(1430,moving.y+e.clientY-moving.pageY));moving.el.style.left=p.x+'px';moving.el.style.top=p.y+'px';drawWires()}else if(state.pending){const r=$('#stage').getBoundingClientRect();state.pointer={x:e.clientX-r.left,y:e.clientY-r.top};drawWires()}});
 document.addEventListener('pointerup',()=>{if(moving){moving=null;commit()}});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){state.pending=null;state.pointer=null;drawWires();$('#connectHint').textContent='Click two terminals to wire · Drag headers to move parts · Middle-drag to pan'}if((e.key==='Delete'||e.key==='Backspace')&&!['TEXTAREA','INPUT'].includes(document.activeElement?.tagName)){deleteSelected()}if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();runProgram()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){state.pending=null;state.pointer=null;drawWires();$('#connectHint').textContent='Click two terminals to wire · Drag headers to move parts · Middle-drag to pan'}if((e.key==='Delete'||e.key==='Backspace')&&!['TEXTAREA','INPUT'].includes(document.activeElement?.tagName)){deleteSelected()}if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)&&!window.piLabShell?.visible()){e.preventDefault();runProgram()}});
 for(const b of document.querySelectorAll('[data-add]'))b.addEventListener('click',()=>addPart(b.dataset.add));
 $('#sampleSelect').addEventListener('change',e=>{killRun();scene(e.target.value)});
 $('#runBtn').addEventListener('click',runProgram);$('#stopBtn').addEventListener('click',killRun);
@@ -12387,6 +12402,92 @@ function initResizableEditor(){
 }
 
 initEnhancedEditor();initResizableEditor();renderPins();try{const saved=localStorage.getItem('pilab-project-v1');if(saved)loadProject(JSON.parse(saved));else scene('button')}catch(err){scene('button')};log('All circuit changes auto-save in this browser.','note');window.addEventListener('DOMContentLoaded',makeWorker,{once:true});
+</script>
+<script>
+// PiLab virtual shell: deliberately local, never connects to a real host.
+window.piLabShell=(()=>{
+ const el=id=>document.getElementById(id),input=el('shInput'),out=el('shOutput');
+ const IP='192.168.1.10', users={pi:'pi',laptop:'student'}, names={pi:'raspberrypi',laptop:'ubuntu'}, home=h=>'/home/'+users[h];
+ const fresh=()=>({pi:{cwd:home('pi'),venv:null,files:{[home('pi')]:{dir:true},[home('pi')+'/Desktop']:{dir:true},[home('pi')+'/Documents']:{dir:true}},envs:{}},laptop:{cwd:home('laptop'),venv:null,files:{[home('laptop')]:{dir:true},[home('laptop')+'/Desktop']:{dir:true},[home('laptop')+'/Documents']:{dir:true}},envs:{}}});
+ let machines=fresh();try{const x=JSON.parse(localStorage.getItem('pilab-shell-v6')||'null');if(x?.pi?.files&&x?.laptop?.files)machines=x}catch{}
+ let host='pi',remote=false,auth=null,nano=null,selected=null,history=[],hist=0,split=false,font=14,job=null,interruptTimer=null,lastCodePath=null;
+ const machine=()=>machines[host],own=(obj,k)=>Object.prototype.hasOwnProperty.call(obj,k);
+ function persist(){try{localStorage.setItem('pilab-shell-v6',JSON.stringify(machines))}catch{write('Storage unavailable; download your files to keep them.','error')}}
+ function norm(h,p,base=machines[h].cwd){p=String(p||home(h));if(p==='~'||p.startsWith('~/'))p=home(h)+p.slice(1);const arr=[];for(const k of (p.startsWith('/')?p:base+'/'+p).split('/')){if(!k||k==='.')continue;if(k==='..')arr.pop();else arr.push(k)}return '/'+arr.join('/')}
+ const parent=p=>p.slice(0,p.lastIndexOf('/'))||'/',baseName=p=>p.split('/').pop();
+ function isDir(h,p){return p==='/'||p==='/home'||!!machines[h].files[p]?.dir}
+ function validWrite(h,p){return p.startsWith(home(h)+'/')&&isDir(h,parent(p))&&!machines[h].files[p]?.dir}
+ function put(h,p,text){if(!validWrite(h,p))throw Error('Cannot write '+p+': no such directory, or permission denied');machines[h].files[p]={text:String(text)};persist();refreshFiles()}
+ function mkdir(h,p,parents=false){if(isDir(h,p)){if(parents)return;throw Error('File exists: '+p)}if(!p.startsWith(home(h)+'/')||machines[h].files[p])throw Error('Cannot create directory: '+p);if(!isDir(h,parent(p))){if(!parents)throw Error('No such directory: '+parent(p));mkdir(h,parent(p),true)}machines[h].files[p]={dir:true}}
+ function write(text,kind=''){const line=document.createElement('div');line.textContent=String(text);if(kind)line.className='sh-out-'+kind;out.append(line);while(out.children.length>800)out.firstChild.remove();scroll()}
+ function scroll(){const v=el('shScroll');v.scrollTop=v.scrollHeight}
+ function prompt(){const m=machine(),cwd=m.cwd===home(host)?'~':m.cwd.startsWith(home(host)+'/')?'~'+m.cwd.slice(home(host).length):m.cwd;return (m.venv?'('+baseName(m.venv)+') ':'')+users[host]+'@'+names[host]+':'+cwd+'$ '}
+ function refresh(){el('shTitle').textContent=users[host]+'@'+names[host]+(remote?' · SSH':'');el('shHostInfo').textContent=(host==='pi'?'192.168.1.10 · Raspberry Pi OS practice':'192.168.1.20 · Ubuntu practice')+(remote?' · SSH connected':'');el('shLaptop').classList.toggle('active',host==='laptop');el('shPi').classList.toggle('active',host==='pi');el('shStatus').textContent=job?(state.inputQueue.length?'Python waiting for input':'Python running'):auth?'Authentication':nano?'Editing file':state.pyReady?'Shell ready · Python ready':'Shell ready · Python loading';input.type=auth?'password':'text';el('shPrompt').textContent=auth?auth.prompt:job?(state.inputQueue[0]?.prompt||'') :prompt();el('shForm').hidden=!!nano||!!job&&!state.inputQueue.length;refreshFiles();scroll()}
+ function refreshFiles(){const list=el('shFiles');list.replaceChildren();const files=machine().files;for(const p of Object.keys(files).sort().filter(p=>p.startsWith(home(host)+'/')&&!Object.keys(machine().envs).some(e=>p.startsWith(e+'/')))){const b=document.createElement('button');b.className='sh-file'+(p===selected?' active':'');b.textContent=(files[p].dir?'▸ ':'· ')+p.slice(home(host).length+1);b.onclick=()=>{selected=p;refreshFiles()};b.ondblclick=()=>{if(files[p].dir){machine().cwd=p;persist();refresh()}else openNano(p)};list.append(b)}}
+ function show(on){document.body.classList.toggle('shell-active',on);document.body.classList.toggle('shell-split',on&&split);el('shellPage').hidden=!on;el('shellTab').classList.toggle('active',on);el('circuitTab').classList.toggle('active',!on);if(on){if(window.piLabResizeEditor?.getState().expanded)window.piLabResizeEditor.setMaximized(false);refresh();if(!nano)input.focus()}else{requestAnimationFrame(()=>{pythonEditor?.refresh();drawWires();if(state.inputQueue.length)renderTerminalInput()})}}
+ function switchHost(h){if(job||nano||auth){write('Finish the current operation first.','error');return}host=h;remote=false;selected=null;refresh();write('Opened '+names[h]+' terminal.','note');input.focus()}
+ function openNano(p){if(machine().files[p]?.dir)throw Error('Is a directory: '+p);if(!machine().files[p]&&!validWrite(host,p))throw Error('No such directory or permission denied');nano={host,path:p,original:machine().files[p]?.text||''};el('shNanoName').textContent=p;el('shNanoText').value=nano.original;el('shNanoStatus').textContent='';el('shNano').hidden=false;refresh();el('shNanoText').focus()}
+ function saveNano(){if(!nano)return;try{put(nano.host,nano.path,el('shNanoText').value);nano.original=el('shNanoText').value;selected=nano.path;el('shNanoStatus').textContent='Wrote '+nano.original.split('\n').length+' lines'}catch(e){el('shNanoStatus').textContent=e.message}}
+ function exitNano(){if(!nano)return;if(el('shNanoText').value!==nano.original&&!confirm('Exit nano without saving changes?'))return;nano=null;el('shNano').hidden=true;refresh();input.focus()}
+ // Small shell tokenizer: quotes, escapes, &&, ;, > and >>, no shell expansion/execution on host.
+ function tokenize(line){let q='',word='',started=false,t=[];function flush(){if(started){t.push({v:word,op:false});word='';started=false}}for(let i=0;i<line.length;i++){const c=line[i];if(c==='\\'&&q!=="'"){if(i+1<line.length){word+=line[++i];started=true}continue}if(q){if(c===q)q='';else word+=c;continue}if(c==='"'||c==="'"){q=c;started=true;continue}if(/\s/.test(c)){flush();continue}if(c==='#'&&!started)break;if(c===';'||c==='>'||c==='&'&&line[i+1]==='&'){flush();let op=c;if((c==='>'&&line[i+1]==='>')||(c==='&'&&line[i+1]==='&'))op+=line[++i];t.push({v:op,op:true});continue}word+=c;started=true}if(q)throw Error('Unclosed quote');flush();return t}
+ function expand(s){const m=machine();return s.replace(/\$(HOME|USER|PWD|VIRTUAL_ENV)\b/g,(_,key)=>({HOME:home(host),USER:users[host],PWD:m.cwd,VIRTUAL_ENV:m.venv||''})[key])}
+ function read(h,p){const f=machines[h].files[p];if(!f||f.dir)throw Error('No such file: '+p);return f.text}
+ function copy(h1,src,h2,dst){if(isDir(h2,dst))dst=norm(h2,baseName(src),dst);put(h2,dst,read(h1,src));return dst}
+ function authenticate(action){auth={prompt:'pi@'+IP+"'s password: ",action};refresh();input.focus()}
+ function scp(args){args=args.filter(a=>a!=='-v'&&a!=='-q');if(args.length!==2)throw Error('Usage: scp SOURCE DESTINATION');const parse=a=>{const m=a.match(/^pi@([^:]+):(.+)$/);if(m){if(![IP,'raspberrypi','raspberrypi.local'].includes(m[1]))throw Error('Host unreachable: '+m[1]);return {h:'pi',p:norm('pi',m[2],home('pi')),remote:true}}return {h:host,p:norm(host,a),remote:false}};const a=parse(args[0]),b=parse(args[1]);if(!a.remote&&!b.remote)throw Error('Use cp for local files');read(a.h,a.p);authenticate(()=>{const dst=copy(a.h,a.p,b.h,b.p);write(baseName(dst)+'   100%   '+new TextEncoder().encode(read(b.h,dst)).length+' B   0:00','note')})}
+ function startPython(path,code,args=[]){if(state.running||job)throw Error('A Python program is already running');if(!state.pyReady||!state.worker)throw Error('Python runtime is not ready; check your internet connection and retry.');job={host,path};lastCodePath={host,path};refresh();runProgram(code,{path,cwd:machine().cwd,argv:args,files:Object.fromEntries(Object.entries(machine().files).filter(([p,f])=>p.startsWith(home(host)+'/')&&!f.dir&&!Object.keys(machine().envs).some(e=>p.startsWith(e+'/'))).map(([p,f])=>[p,f.text])),dirs:Object.keys(machine().files).filter(p=>machine().files[p].dir&&!Object.keys(machine().envs).some(e=>p===e||p.startsWith(e+'/'))),home:home(host)});refresh()}
+ function execute(tokens){let a=tokens.map(t=>expand(t.v));const cmd=a.shift(),m=machine(),h=host;let result='';const path=p=>norm(h,p);const env=()=>m.venv?m.envs[m.venv]:null;const requireArg=()=>{if(!a.length)throw Error(cmd+': missing operand')};switch(cmd){
+ case 'help':result='Shell commands: pwd, ls, cd, mkdir, touch, cat, echo, cp, mv, rm, rmdir, nano, clear, history, whoami, hostname, hostname -I, ip addr, ifconfig, uname, python3, python, pip3, pip, source, deactivate, ssh, scp, exit.\nSupports &&, ;, > and >>. This is a simulated shell, not a full Linux OS.';break;
+ case 'pwd':result=m.cwd;break;case 'whoami':result=users[h];break;
+ case 'hostname':result=a.includes('-I')?(h==='pi'?IP:'192.168.1.20'):names[h];break;
+ case 'ip':case 'ifconfig':result='1: lo: <LOOPBACK,UP>\n    inet 127.0.0.1/8\n2: '+(h==='pi'?'wlan0':'wlp2s0')+': <BROADCAST,MULTICAST,UP>\n    inet '+(h==='pi'?IP:'192.168.1.20')+'/24';break;
+ case 'uname':result=a.includes('-a')?'Linux '+names[h]+' (simulated) '+(h==='pi'?'aarch64':'x86_64')+' GNU/Linux':a.includes('-m')?(h==='pi'?'aarch64':'x86_64'):'Linux';break;
+ case 'clear':out.replaceChildren();break;case 'history':result=history.map((c,i)=>`${i+1}  ${c}`).join('\n');break;
+ case 'cd':{const p=path(a[0]||home(h));if(!isDir(h,p))throw Error('cd: '+p+': No such directory');m.cwd=p;break}
+ case 'ls':{const p=path(a.find(x=>!x.startsWith('-'))||m.cwd);if(!isDir(h,p)){if(own(m.files,p))result=baseName(p);else throw Error('ls: No such file or directory');break}const children=Object.keys(m.files).filter(x=>parent(x)===p&&(a.some(x=>x.startsWith('-')&&x.includes('a'))||!baseName(x).startsWith('.'))).sort();result=children.map(x=>a.some(x=>x.startsWith('-')&&x.includes('l'))?(m.files[x].dir?'drwxr-xr-x':'-rw-r--r--')+'  '+users[h]+' '+String(m.files[x].text?.length||0).padStart(6)+'  '+baseName(x):baseName(x)+(m.files[x].dir?'/':'')).join(a.some(x=>x.startsWith('-')&&x.includes('l'))?'\n':'    ');break}
+ case 'mkdir':requireArg();for(const p of a.filter(x=>!x.startsWith('-')))mkdir(h,path(p),a.includes('-p'));break;
+ case 'touch':requireArg();for(const p of a.map(path)){if(!own(m.files,p))put(h,p,'')}break;
+ case 'cat':requireArg();result=a.map(p=>read(h,path(p))).join('\n');break;
+ case 'echo':result=a.join(' ');break;
+ case 'cp':case 'mv':{if(a.length!==2)throw Error('Usage: '+cmd+' SOURCE DEST');const src=path(a[0]),dst=copy(h,src,h,path(a[1]));if(cmd==='mv'&&src!==dst)delete m.files[src];break}
+ case 'rm':case 'rmdir':{requireArg();const recursive=a.some(x=>/^-[a-z]*r/.test(x));for(const p of a.filter(x=>!x.startsWith('-')).map(path)){if(!p.startsWith(home(h)+'/')||!own(m.files,p))throw Error(cmd+': cannot remove '+p);const children=Object.keys(m.files).filter(x=>x.startsWith(p+'/'));if(m.files[p].dir&&cmd==='rm'&&!recursive)throw Error('Is a directory: '+p);if(cmd==='rmdir'&&(!m.files[p].dir||children.length))throw Error('Not an empty directory: '+p);for(const x of [p,...children])delete m.files[x];for(const e of Object.keys(m.envs))if(e===p||e.startsWith(p+'/')){delete m.envs[e];if(m.venv===e)m.venv=null}if(m.cwd===p||m.cwd.startsWith(p+'/'))m.cwd=home(h)}break}
+ case 'nano':requireArg();openNano(path(a[0]));break;
+ case 'python':case 'python3':{if(a[0]==='--version'||a[0]==='-V'){result='Python 3.12 (PiLab browser runtime)';break}if(a[0]==='-m'&&a[1]==='venv'){const name=a.filter(x=>!x.startsWith('-')).slice(1).pop();if(!name||name==='venv')throw Error('Usage: python3 -m venv env');const p=path(name);if(!isDir(h,p))mkdir(h,p,true);for(const d of ['bin','lib','include'])mkdir(h,p+'/'+d,true);m.envs[p]=m.envs[p]||{packages:{},system:a.includes('--system-site-packages')};put(h,p+'/bin/activate','# PiLab simulated activation script\n');put(h,p+'/pyvenv.cfg','home = /usr/bin\ninclude-system-site-packages = '+String(m.envs[p].system)+'\n');break}if(a[0]==='-m'&&a[1]==='pip'){return execute([{v:'pip'},...a.slice(2).map(v=>({v}))])}if(a[0]==='-c'){if(a.length<2)throw Error('Argument expected');startPython(path('command.py'),a[1]);break}if(!a.length)throw Error('Interactive Python REPL is not implemented. Use python3 FILE.py or python3 -c "...".');const p=path(a[0]);startPython(p,read(h,p),a.slice(1));break}
+ case 'source':case '.':{requireArg();const p=path(a[0]),e=p.replace(/\/bin\/activate$/,'');if(!m.envs[e]||p===e)throw Error('No such activation script: '+p);m.venv=e;break}
+ case 'deactivate':if(!m.venv)throw Error('deactivate: command not found');m.venv=null;break;
+ case 'which':{requireArg();result=['python','python3','pip','pip3'].includes(a[0])?(m.venv?m.venv+'/bin/':'/usr/bin/')+a[0]:'/usr/bin/'+a[0];break}
+ case 'pip':case 'pip3':{const e=env(),packages=e?.packages||{'RPi.GPIO':'0.7.1','gpiozero':'2.0.1'};if(a[0]==='--version'){result='pip (simulated) from '+(m.venv||'/usr/lib/python3');break}if(a[0]==='list'||a[0]==='freeze'){result=Object.entries(packages).map(([k,v])=>k+(a[0]==='freeze'?'==':'  ')+v).join('\n')||'(no packages installed in this virtual environment)';break}if(a[0]!=='install')throw Error('Supported pip operations: install, list, freeze');if(!e)throw Error('Activate a virtual environment first: source env/bin/activate');for(const pkg of a.slice(1).filter(x=>!x.startsWith('-'))){const k=pkg.split('==')[0].toLowerCase();const canonical={'rpi.gpio':'RPi.GPIO',gpiozero:'gpiozero'}[k];if(!canonical)throw Error('Package not supported by this simulator: '+pkg);e.packages[canonical]=k==='rpi.gpio'?'0.7.1':'2.0.1';write('Collecting '+canonical+' (simulated)');write('Successfully installed '+canonical+'-'+e.packages[canonical]+' (virtual environment metadata)','note')}break}
+ case 'ssh':{requireArg();if(host==='pi')throw Error('Open the Ubuntu laptop terminal to practise SSH.');const target=a[0];if(!['pi@'+IP,'pi@raspberrypi','pi@raspberrypi.local'].includes(target))throw Error('ssh: Could not resolve virtual host '+target);authenticate(()=>{host='pi';remote=true;machine().cwd=home(host);machine().venv=null;selected=null;write('Linux raspberrypi · Raspberry Pi OS (simulated SSH session)','note')});break}
+ case 'scp':scp(a);break;
+ case 'exit':case 'logout':if(remote){host='laptop';remote=false;selected=null;write('Connection to '+IP+' closed.','note')}else write('Local terminal remains open. Use the host buttons to switch.','note');break;
+ case 'sudo':throw Error('sudo and system package management are not implemented in the virtual shell.');
+ default:throw Error(cmd+': command not found (or not supported in PiLab)')}
+ persist();return result}
+ function runLine(line){const tokens=tokenize(line);let group=[],prevOk=true,connector=';';function runGroup(){if(!group.length)return;const g=group;group=[];if(connector==='&&'&&!prevOk)return;try{const idx=g.findIndex(t=>t.op&&['>','>>'].includes(t.v));let redir=null;if(idx>=0){if(idx!==g.length-2)throw Error('Expected one output filename');redir={append:g[idx].v==='>>',path:norm(host,expand(g[idx+1].v))};g.splice(idx)}if(g.some(t=>t.op))throw Error('Unsupported shell operator');const value=execute(g);if(redir){const old=redir.append?machine().files[redir.path]?.text||'':'';put(host,redir.path,old+value+'\n')}else if(value)write(value);prevOk=true}catch(e){write(e.message,'error');prevOk=false}}
+ for(const t of tokens){if(t.op&&['&&',';'].includes(t.v)){runGroup();if(auth||nano||job){write('Remaining commands skipped while an interactive operation is active.','note');return}connector=t.v}else group.push(t)}runGroup()}
+ function submit(){const text=input.value;input.value='';if(auth){const action=auth.action;auth=null;if(text==='raspberry'){try{action()}catch(e){write(e.message,'error')}}else write('Permission denied (simulated).','error');refresh();return}if(job){const req=state.inputQueue.shift();if(req&&state.worker){write((req.prompt||'')+text,'command');state.worker.postMessage({type:'inputResponse',id:req.id,value:text});renderTerminalInput()}refresh();return}if(!text.trim())return;history.push(text);hist=history.length;write(prompt()+text,'command');try{runLine(text)}catch(e){write(e.message,'error')}refresh()}
+ function interrupt(){if(nano){exitNano();return}input.value='';if(auth){auth=null;write('^C','note');refresh();return}if(job&&state.running){write('^C','note');if(state.worker)state.worker.postMessage({type:'stop'});clearTimeout(interruptTimer);interruptTimer=setTimeout(()=>{if(job&&state.running){write('Program did not yield; forcing Stop.','note');killRun()}},1200);return}write('^C','note');refresh()}
+ function finish(){if(!job)return;clearTimeout(interruptTimer);job=null;refresh();if(!el('shellPage').hidden)input.focus()}
+ function syncFiles(message){if(!job||message.home!==home(job.host))return;const m=machines[job.host],root=home(job.host);for(const [p,f] of Object.entries(message.files||{})){if(!p.startsWith(root+'/')||Object.keys(m.envs).some(e=>p===e||p.startsWith(e+'/')))continue;if(f.dir||typeof f.text==='string')m.files[p]=f}persist();refreshFiles()}
+ function onLog(text,kind){if(job)write(text,kind==='err'?'error':kind==='note'?'note':'')}
+ function complete(){const v=input.value;if(!v.includes(' ')){const cmds='help pwd ls cd mkdir touch cat echo cp mv rm rmdir nano clear history whoami hostname ip ifconfig uname python python3 pip pip3 source deactivate ssh scp exit which'.split(' ').filter(c=>c.startsWith(v));if(cmds.length===1)input.value=cmds[0]+' ';else if(cmds.length)write(cmds.join('  '),'note');return}const i=v.lastIndexOf(' '),prefix=v.slice(i+1),p=norm(host,prefix||'.'),d=prefix.endsWith('/')?p:prefix?parent(p):machine().cwd,part=prefix.endsWith('/')?'':prefix?baseName(p):'';const opts=Object.keys(machine().files).filter(x=>parent(x)===d&&baseName(x).startsWith(part));if(opts.length===1){const suffix=baseName(opts[0]).slice(part.length)+(machine().files[opts[0]].dir?'/':' ');input.value=v+suffix}else if(opts.length)write(opts.map(baseName).join('  '),'note')}
+ el('shellTab').onclick=()=>show(true);el('circuitTab').onclick=()=>show(false);el('shSplit').onclick=()=>{split=!split;el('shSplit').textContent=split?'Hide circuit':'Show circuit';el('shSplit').setAttribute('aria-pressed',String(split));show(true);requestAnimationFrame(drawWires)};
+ el('shPi').onclick=()=>switchHost('pi');el('shLaptop').onclick=()=>switchHost('laptop');el('shForm').onsubmit=e=>{e.preventDefault();submit()};el('shInterrupt').onclick=interrupt;el('shClear').onclick=()=>{out.replaceChildren();input.focus()};el('shNanoSave').onclick=saveNano;el('shNanoExit').onclick=exitNano;
+ el('shNanoText').addEventListener('keydown',e=>{if(e.ctrlKey&&['o','x'].includes(e.key.toLowerCase())){e.preventDefault();e.stopPropagation();e.key.toLowerCase()==='o'?saveNano():exitNano()}else if(e.key==='Tab'){e.preventDefault();e.target.setRangeText('    ',e.target.selectionStart,e.target.selectionEnd,'end')}});
+ document.addEventListener('keydown',e=>{if(el('shellPage').hidden||nano||!e.ctrlKey)return;if(e.key.toLowerCase()==='c'&&(job||auth||document.activeElement===input)&&!window.getSelection()?.toString()){e.preventDefault();e.stopImmediatePropagation();interrupt()}if(e.key.toLowerCase()==='l'){e.preventDefault();out.replaceChildren()}},true);
+ input.addEventListener('keydown',e=>{if(auth||job)return;if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();hist=Math.max(0,Math.min(history.length,hist+(e.key==='ArrowUp'?-1:1)));input.value=history[hist]||''}if(e.key==='Tab'){e.preventDefault();complete()}});
+ const zoom=d=>{font=Math.max(10,Math.min(26,font+d));el('shScroll').closest('.sh-terminal').style.setProperty('--sh-font',font+'px')};el('shSmaller').onclick=()=>zoom(-1);el('shLarger').onclick=()=>zoom(1);
+ el('shReset').onclick=()=>{if(job||nano||auth)return;if(confirm('Reset both virtual filesystems? This deletes virtual files and environments.')){machines=fresh();host='pi';remote=false;selected=null;lastCodePath=null;persist();out.replaceChildren();refresh()}};
+ el('shLabCircuit').onclick=()=>{if(state.running){write('Stop Python before replacing the circuit.','error');return}if(!confirm('Replace current circuit with the Lab 5 LED circuit?'))return;scene('blink');const r=state.parts.find(p=>p.type==='resistor');if(r){r.ohms=330;r.x=345;r.y=100}const led=state.parts.find(p=>p.type==='led');if(led){led.x=345;led.y=330}renderAll();commit();write('Loaded GPIO17 → 330 Ω → LED → GND. Click Show circuit to view.','note')};
+ el('shOpenEditor').onclick=()=>{if(job||nano||!selected||!selected.endsWith('.py')){write('Select a .py file in Environment files first.','error');return}try{setCode(read(host,selected));lastCodePath={host,path:selected};scheduleSave();show(false);focusCode()}catch(e){write(e.message,'error')}};
+ el('shSaveEditor').onclick=()=>{if(job||nano)return;const suggested=lastCodePath?.host===host?lastCodePath.path:'main.py';const name=window.prompt('Save code editor to virtual file:',suggested);if(name){try{const p=norm(host,name);put(host,p,getCode());selected=p;lastCodePath={host,path:p};write('Saved '+p,'note');refresh()}catch(e){write(e.message,'error')}}};
+ el('shImport').onclick=()=>el('shUpload').click();el('shUpload').onchange=async e=>{const f=e.target.files[0];if(f){try{if(f.size>500000)throw Error('Text files must be smaller than 500 KB');put(host,norm(host,f.name),await f.text());write('Imported '+f.name,'note')}catch(err){write(err.message,'error')}}e.target.value=''};
+ el('shExport').onclick=()=>{try{const text=read(host,selected);const url=URL.createObjectURL(new Blob([text],{type:'text/plain'}));const a=document.createElement('a');a.href=url;a.download=baseName(selected);a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}catch(e){write('Select a file first.','error')}};
+ for(const cmd of ['hostname -I','ssh pi@192.168.1.10','mkdir my_project && cd my_project','python -m venv env','source env/bin/activate','pip3 install RPi.GPIO','nano simple_io.py','python3 simple_io.py','deactivate','exit','scp pi@192.168.1.10:/home/pi/my_project/simple_io.py .','scp simple_io.py pi@192.168.1.10:/home/pi/my_project']){const b=document.createElement('button');b.className='sh-command';b.textContent=cmd;b.onclick=()=>{if(!auth&&!job&&!nano){input.value=cmd;input.focus()}};el('shCommands').append(b)}
+ write('PiLab Studio v6 · Virtual Raspberry Pi OS terminal','note');write('Type help to see supported commands. Select Ubuntu laptop for SSH / SCP practice.','note');refresh();return {onLog,finish,refresh,syncFiles,isJob:()=>!!job,visible:()=>!el('shellPage').hidden};
+})();
+
 </script>
 <script type="text/plain" id="workerSource">
 'use strict';
@@ -12847,31 +12948,49 @@ class SimTransformer(ast.NodeTransformer):
             node.body.insert(0,tick)
         return node
 
-def __make_sim_program__(code):
+def __make_sim_program__(code,filename="main.py"):
     # Compile at MODULE scope: defining user functions inside a hidden async
     # wrapper makes global variables point to the wrong namespace.
     # Top-level await keeps input(), time.sleep(), wait_for_edge(), and GPIO
     # polling cooperative, without changing Python's module-level scoping.
-    module=ast.parse(code,filename='main.py')
+    module=ast.parse(code,filename=filename)
     transformer=SimTransformer(__sim_needs_async__(module.body))
     module.body=[transformer.visit(stmt) for stmt in module.body]
     ast.fix_missing_locations(module)
-    return compile(module,'main.py','exec',flags=ast.PyCF_ALLOW_TOP_LEVEL_AWAIT)
+    return compile(module,filename,'exec',flags=ast.PyCF_ALLOW_TOP_LEVEL_AWAIT)
 
-async def __run_user_code__(code):
+async def __run_user_code__(code,filename='main.py',cwd=None,argv=None):
+    import os
+    if cwd:os.chdir(cwd)
+    else:os.makedirs('/home/pyodide',exist_ok=True);os.chdir('/home/pyodide')
+    sys.argv=[filename]+list(argv or [])
+    if cwd and cwd not in sys.path:sys.path.insert(0,cwd)
     GPIO.config.clear();GPIO.values.clear();GPIO.mode=None
     GPIO.detectors.clear();GPIO.event_flags.clear();GPIO.waiters.clear();GPIO._edge_override.clear()
     _live_buttons.clear()
     sim_clear_edges()
     # A fresh namespace per Run, like launching a new python3 main.py process.
-    namespace={'__name__':'__main__','__sim_sleep__':__sim_sleep__,'__sim_tick__':__sim_tick__,'__sim_input__':__sim_input__}
-    result=eval(__make_sim_program__(code),namespace)
+    namespace={'__name__':'__main__','__file__':filename,'__sim_sleep__':__sim_sleep__,'__sim_tick__':__sim_tick__,'__sim_input__':__sim_input__}
+    result=eval(__make_sim_program__(code,filename),namespace)
     if inspect.isawaitable(result):
         await result
 `;
 async function init(){if(loading)return loading;loading=(async()=>{try{self.postMessage({type:'loading'});importScripts('https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js');pyodide=await loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/'});pyodide.setStdout({batched:s=>self.postMessage({type:'stdout',message:s})});pyodide.setStderr({batched:s=>self.postMessage({type:'stderr',message:s})});pyodide.runPython(setupPython);self.postMessage({type:'ready'})}catch(e){self.postMessage({type:'loadError',message:e.message||String(e)})}})();return loading}
-async function run(code){if(running)return;if(!pyodide){await init();if(!pyodide)return}running=true;stopRequested=false;self.postMessage({type:'started'});let stopped=false;try{pyodide.globals.set('__source_code__',code);await pyodide.runPythonAsync('await __run_user_code__(__source_code__)')}catch(e){if(stopRequested||String(e).includes('KeyboardInterrupt'))stopped=true;else self.postMessage({type:'error',message:e.message||String(e)})}finally{
- running=false;
+function shellMount(o){
+ if(!o)return;
+ const fs=pyodide.FS,root=o.home;
+ if(!['/home/pi','/home/student'].includes(root))throw Error('Invalid virtual home');
+ function removeTree(p){for(const name of fs.readdir(p)){if(name==='.'||name==='..')continue;const q=p+'/'+name,st=fs.lstat(q);if(fs.isDir(st.mode)){removeTree(q);fs.rmdir(q)}else fs.unlink(q)}}
+ fs.chdir('/');try{removeTree(root)}catch(e){if(fs.analyzePath(root).exists)throw e}
+ fs.mkdirTree(root);
+ const valid=p=>typeof p==='string'&&(p===root||p.startsWith(root+'/'))&&!p.split('/').includes('..');
+ for(const p of o.dirs||[])if(valid(p))fs.mkdirTree(p);
+ for(const [p,text] of Object.entries(o.files||{})){if(!valid(p)||p===root)continue;fs.mkdirTree(p.slice(0,p.lastIndexOf('/')));fs.writeFile(p,String(text))}
+ fs.mkdirTree(o.cwd); // cwd is a simulated directory
+}
+function shellSnapshot(o){if(!o)return;const fs=pyodide.FS,files={},root=o.home;let bytes=0,count=0;function walk(p){for(const name of fs.readdir(p)){if(name==='.'||name==='..'||name==='__pycache__')continue;const q=p+'/'+name,st=fs.lstat(q);if(++count>1000)return;if(fs.isDir(st.mode)){files[q]={dir:true};walk(q)}else if(fs.isFile(st.mode)&&st.size<500000&&bytes+st.size<2000000){try{const text=new TextDecoder('utf-8',{fatal:true}).decode(fs.readFile(q));files[q]={text};bytes+=st.size}catch{}}}}try{walk(root);self.postMessage({type:'shellFiles',home:root,files})}catch(e){self.postMessage({type:'stderr',message:'Virtual file sync failed: '+e.message})}}
+async function run(code,options=null){if(running)return;if(!pyodide){await init();if(!pyodide)return}running=true;stopRequested=false;self.postMessage({type:'started'});let stopped=false;try{shellMount(options);pyodide.globals.set('__source_code__',code);pyodide.globals.set('__shell_options_json__',JSON.stringify(options||{}));await pyodide.runPythonAsync("__pilab_opts=json.loads(__shell_options_json__); await __run_user_code__(__source_code__, __pilab_opts.get('path','main.py'), __pilab_opts.get('cwd'), __pilab_opts.get('argv'))")}catch(e){if(stopRequested||String(e).includes('KeyboardInterrupt'))stopped=true;else self.postMessage({type:'error',message:e.message||String(e)})}finally{
+ shellSnapshot(options);running=false;
  for(const resolve of pendingTerminalRequests.values())resolve('');
  pendingTerminalRequests.clear();
  self.postMessage({type:'finished',stopped});
@@ -12900,7 +13019,7 @@ json.dumps(_pilab_checked)
   self.postMessage({type:'syntax',id,...JSON.parse(serialized)});
  }catch(err){self.postMessage({type:'syntax',id,ok:false,line:1,column:1,message:'Parser error: '+String(err.message||err)})}
 }
-self.onmessage=e=>{const m=e.data;switch(m.type){case 'init':init();break;case 'run':run(m.code);break;case 'check':checkSyntax(m.code,m.id);break;case 'stop':stopRequested=true;break;case 'inputResponse':{
+self.onmessage=e=>{const m=e.data;switch(m.type){case 'init':init();break;case 'run':run(m.code,m.options);break;case 'check':checkSyntax(m.code,m.id);break;case 'stop':stopRequested=true;break;case 'inputResponse':{
  const resolve=pendingTerminalRequests.get(m.id);
  if(resolve){pendingTerminalRequests.delete(m.id);resolve(String(m.value??''))}
  break;

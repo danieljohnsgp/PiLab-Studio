@@ -1,24 +1,31 @@
-PiLab Studio v5.5 — Resizable Python Editor (Disclaimer, made by AI)
-=========================================
+# PiLab Studio v6 — Raspberry Pi OS Lab
 
-WHAT'S NEW
-- Drag the left edge of the Python workspace to make the editor wider or narrower on desktop.
-- Drag the horizontal divider between the code editor and terminal to give more vertical space to either panel.
-- Click "⛶ Expand" beside main.py for a near full-screen code editor; click "Restore" or press Esc to return.
-- Panel dimensions are saved locally in the browser and restored on the next visit.
-- Width and height handles also support keyboard arrow keys for accessibility (focus with Tab; use arrows; Home resets).
-- The terminal's separate Expand/Shrink control continues to work.
+Open `index.html` in Chrome or Edge. The terminal shell works locally; Python execution uses Pyodide loaded from the jsDelivr CDN, so internet access is required to start the Python runtime.
 
-PREVIOUS FEATURES INCLUDED
-Raspberry Pi 4 40-pin GPIO header; draggable electrical components and click wiring; LED colors; button press cycles; GPIO callbacks; Python global variables; input() prompts; terminal font zoom; Python autocomplete, smart indentation, error markers; project saving and loading; stop/reset controls.
+## Workspaces
+- **Circuit & Python**: the original v5.5 GPIO simulator, smart editor, callbacks, terminal input and resize controls.
+- **Pi OS Terminal**: a simulated Linux shell, two virtual computers, local file storage, simulated Python virtual environments, pip, SSH and SCP. Click Show circuit to watch the same virtual GPIO circuit while executing scripts.
 
-HOW TO RUN
-1. Open Raspberry_Pi_4_GPIO_Lab_v5_5_RESIZABLE_EDITOR.html in a modern desktop browser.
-2. Internet access is required to load the Pyodide Python interpreter.
-3. If using a narrow window or zoomed display, use Expand for the largest Python editing area.
-4. For standalone use, keep the HTML file. No build/install step is required.
+## Lab practice
+1. Select Raspberry Pi 4 and type `hostname -I`. The virtual Pi address is 192.168.1.10.
+2. Select Ubuntu laptop. Type `ssh pi@192.168.1.10` and enter the practice password `raspberry`.
+3. `mkdir my_project && cd my_project`
+4. `python -m venv env`
+5. `source env/bin/activate`
+6. `pip3 install RPi.GPIO`
+7. `nano simple_io.py` — type your Python script. Ctrl+O saves; Ctrl+X exits. Alternatively save code from the original editor into a virtual file.
+8. Load the GPIO17 LED circuit or wire an LED with a 330-ohm resistor yourself. Click Show circuit, then `python3 simple_io.py`.
+9. Ctrl+C requests a cooperative Python KeyboardInterrupt, allowing try/finally cleanup for yielding scripts. If the program does not yield, the app forces a worker shutdown and resets GPIO.
+10. `deactivate`, then `exit` to return to Ubuntu.
+11. `scp pi@192.168.1.10:/home/pi/my_project/simple_io.py .` and enter the practice password. To copy back: `scp simple_io.py pi@192.168.1.10:/home/pi/my_project`.
 
-NOTES
-This is an educational GPIO simulation, not a full Raspberry Pi OS emulator.
-The resizable editor was verified in a headless Chromium interface test; execution of the remote Python runtime could not be fully verified in this testing environment.
-CodeMirror is distributed under the bundled MIT license.
+Type `help` for other supported commands. Files are saved in browser storage; use Download selected file for backups. Virtual files are separate from the circuit project JSON. Text files are mirrored into the browser Python filesystem for script execution; new or changed supported text files are copied back after normal/cooperative completion. A forced stop cannot guarantee file synchronization.
+
+## Limits
+This is not Raspberry Pi OS, a Bash implementation, an ARM emulator, or real SSH/SCP networking. Virtual environment and pip commands maintain simulated metadata rather than creating actual isolated interpreters or installing Linux packages. The GPIO libraries are PiLab's simulated Python modules. Not every shell command, Python package or hardware behavior is supported. The virtual password is for practice only. No real SSH credentials should be entered. Ctrl+C can run cleanup on cooperative code, while Stop deliberately forces reset. The simulator is not a substitute for hardware safety tests.
+
+## GitHub Pages
+Replace your repository's existing `index.html` with the included `index.html`. Commit the change. Keep your repository's existing license and retain the CodeMirror MIT license included here. Test the hosted site, including live Pyodide loading and GPIO operation.
+
+## Verification
+Automated browser tests used a mocked Python worker to check the shell, SSH/SCP workflows, nano, run routing, circuit split and stop controls. A separate CPython test checked module execution, cwd, arguments, input and finally cleanup. The live CDN-loaded Pyodide runtime was not verified end-to-end in the test environment.
